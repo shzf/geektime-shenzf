@@ -1,0 +1,23 @@
+.newslist {
+    display: flex;
+    flex-wrap: wrap;
+}
+.news-item{
+    width: 200px;
+    white-space: normal;
+    border: 1px solid #e6e1e1;
+    margin: 10px;
+    box-shadow: 3px 3px 12px #888888;
+    cursor: pointer;
+    transition: all 0.3s ease-out;
+    padding: 8px;
+    background: #ffffff;
+}
+.news-item:hover{
+    transform:scale(1.1);
+
+}
+.date{
+    color: #888;
+    font-size: 12px;
+}
