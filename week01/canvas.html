@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8" />
+</head>
+<body>
+<div>
+        <div>
+                <input id="file" type="file" />
+                <button id="gray-button">灰度化</button>
+                <button id="save">保存</button>
+        </div>
+        <canvas id="canvas" width="500" height="500"></canvas>
+</div>
+<script>
+    let inputFile = document.getElementById('file')
+    inputFile.onchange = function () {
+        let file = inputFile.files[0]
+        let reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onload = function (e) {
+            showCanvas(reader.result)
+        }
+    }
+
+    const canvas = document.getElementById('canvas')
+    const ctx = canvas.getContext('2d')
+
+    function showCanvas(dataUrl) {
+        let img = new Image()
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        }
+        img.src = dataUrl
+    }
+
+    function gray() {
+        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        for (let x = 0; x < imageData.width; x++) {
+            for (let y = 0; y < imageData.height; y++) {
+                let idx = (x + y * imageData.width) * 4
+                let r = imageData.data[idx + 0]
+                let g = imageData.data[idx + 1]
+                let b = imageData.data[idx + 2]
+                // 2种灰度化算法都可以
+                let gray = 0.299 * r + 0.587 * g + 0.114 * b
+                // let gray = (r + g + b) / 3
+                imageData.data[idx + 0] = gray
+                imageData.data[idx + 1] = gray
+                imageData.data[idx + 2] = gray
+                imageData.data[idx + 3] = 255
+            }
+        }
+        ctx.putImageData(imageData, 0, 0)
+    }
+
+    function save() {
+        canvas.toBlob(async function (blob) {
+            const option = {
+                types: [
+                    {
+                        description: 'Images',
+                        accept: {
+                            'image/png': ['.png'],
+                        },
+                    },
+                ],
+            }
+            try {
+                // 需要在Chrome高版本下运行
+                const file = await window.showSaveFilePicker(option)
+                const writable = await file.createWritable()
+                await writable.write(blob)
+                await writable.close()
+                alert('保存成功')
+            } catch (error) {
+                alert('保存失败')
+            }
+        })
+    }
+
+    document.querySelector('#gray-button').addEventListener(
+        'click',
+        function () {
+            gray()
+        },
+        false
+    )
+    document.querySelector('#save').addEventListener(
+        'click',
+        function () {
+            save()
+        },
+        false
+    )
+</script>
+</body>
+</html>
